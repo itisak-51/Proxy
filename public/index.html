@@ -24,8 +24,25 @@
       padding: 30px;
       box-shadow: 0 8px 24px rgba(0,0,0,0.5);
     }
-    h1 { font-size: 1.8rem; font-weight: 600; margin-bottom: 20px; text-align: center; color: #f0f6fc; }
-    .input-group { display: flex; gap: 10px; margin-bottom: 25px; flex-wrap: wrap; }
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-align: center;
+      color: #f0f6fc;
+    }
+    .subtitle {
+      text-align: center;
+      color: #8b949e;
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+    .input-group {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+    }
     .input-group input {
       flex: 1;
       padding: 12px 16px;
@@ -57,7 +74,7 @@
       overflow: hidden;
       margin-bottom: 20px;
       position: relative;
-      padding-top: 56.25%;
+      padding-top: 56.25%; /* 16:9 */
     }
     .player-wrapper video {
       position: absolute;
@@ -67,150 +84,228 @@
     }
     .actions {
       display: flex;
-      gap: 15px;
+      gap: 12px;
       justify-content: center;
       flex-wrap: wrap;
       margin-top: 10px;
     }
     .actions button {
-      padding: 12px 30px;
+      padding: 11px 22px;
       border: none;
       border-radius: 8px;
       font-weight: 600;
-      font-size: 1rem;
+      font-size: 0.95rem;
       cursor: pointer;
-      transition: background 0.2s;
+      transition: background 0.2s, transform 0.1s;
     }
     .actions button:active { transform: scale(0.97); }
     .btn-download { background: #1f6feb; color: white; }
     .btn-download:hover { background: #388bfd; }
-    .btn-download:disabled { opacity: 0.5; pointer-events: none; }
+    .btn-download:disabled { opacity: 0.45; pointer-events: none; }
     .btn-copy { background: #30363d; color: #e6edf3; }
     .btn-copy:hover { background: #3d444d; }
+    .btn-open { background: #21262d; color: #e6edf3; border: 1px solid #30363d; }
+    .btn-open:hover { background: #30363d; }
     .status {
-      margin-top: 15px;
-      padding: 10px;
-      border-radius: 6px;
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 8px;
       text-align: center;
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       background: #21262d;
       color: #8b949e;
-      min-height: 44px;
+      min-height: 48px;
       display: flex;
       align-items: center;
       justify-content: center;
       word-break: break-all;
+      line-height: 1.4;
     }
     .status.error { background: #2d1b1e; color: #f85149; }
     .status.success { background: #1b2d1f; color: #3fb950; }
+    .status.info { background: #1c2b3a; color: #58a6ff; }
     .footer {
-      margin-top: 20px;
+      margin-top: 22px;
       text-align: center;
       font-size: 0.85rem;
       color: #8b949e;
       border-top: 1px solid #21262d;
-      padding-top: 15px;
+      padding-top: 16px;
     }
     .footer a { color: #58a6ff; text-decoration: none; }
+    .footer a:hover { text-decoration: underline; }
     @media (max-width: 600px) {
-      .container { padding: 15px; }
+      .container { padding: 18px; }
       .input-group { flex-direction: column; }
       .input-group button { width: 100%; }
     }
   </style>
 </head>
 <body>
-<div class="container">
-  <h1>🎬 Video Proxy Player</h1>
-  <div class="input-group">
-    <input type="url" id="videoUrl" placeholder="Paste video URL (e.g., https://example.com/video.mp4)" autofocus />
-    <button id="loadBtn">Load &amp; Play</button>
-  </div>
-  <div class="player-wrapper">
-    <video id="videoPlayer" controls playsinline></video>
-  </div>
-  <div class="actions">
-    <button class="btn-download" id="downloadBtn" disabled>⬇ Download Video</button>
-    <button class="btn-copy" id="copyBtn">📋 Copy Proxy URL</button>
-  </div>
-  <div class="status" id="status">Paste a video URL and click "Load &amp; Play"</div>
-  <div class="footer">
-    🔒 All requests are proxied through your server – bypass CORS &amp; regional blocks.
-  </div>
-</div>
-<script>
-  const videoUrlInput = document.getElementById('videoUrl');
-  const loadBtn = document.getElementById('loadBtn');
-  const videoPlayer = document.getElementById('videoPlayer');
-  const downloadBtn = document.getElementById('downloadBtn');
-  const copyBtn = document.getElementById('copyBtn');
-  const statusDiv = document.getElementById('status');
+  <div class="container">
+    <h1>🎬 Video Proxy Player</h1>
+    <p class="subtitle">Streams through your server · bypasses CORS &amp; many regional blocks</p>
 
-  function getProxyUrl(originalUrl) {
-    const base = window.location.origin + '/api/proxy?url=';
-    return base + encodeURIComponent(originalUrl);
-  }
+    <div class="input-group">
+      <input
+        type="url"
+        id="videoUrl"
+        placeholder="Paste video URL (e.g. https://example.com/video.mp4)"
+        autofocus
+      />
+      <button id="loadBtn">Load &amp; Play</button>
+    </div>
 
-  function loadVideo(originalUrl) {
-    if (!originalUrl || !originalUrl.trim()) {
-      setStatus('Please enter a valid URL.', 'error');
-      return;
+    <div class="player-wrapper">
+      <video id="videoPlayer" controls playsinline preload="metadata"></video>
+    </div>
+
+    <div class="actions">
+      <button class="btn-download" id="downloadBtn" disabled>⬇ Download</button>
+      <button class="btn-copy" id="copyBtn">📋 Copy Proxy URL</button>
+      <button class="btn-open" id="openBtn">↗ Open Proxy URL</button>
+    </div>
+
+    <div class="status" id="status">Paste a video URL and click “Load &amp; Play”</div>
+
+    <div class="footer">
+      🔒 All requests are proxied · supports Range / seeking<br>
+      Fixed version with proper streaming (no full buffering)
+    </div>
+  </div>
+
+  <script>
+    const videoUrlInput = document.getElementById('videoUrl');
+    const loadBtn = document.getElementById('loadBtn');
+    const videoPlayer = document.getElementById('videoPlayer');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const openBtn = document.getElementById('openBtn');
+    const statusDiv = document.getElementById('status');
+
+    let currentProxyUrl = null;
+
+    function getProxyUrl(originalUrl) {
+      // Works both on Vercel (/api/proxy) and local
+      const base = window.location.origin + '/api/proxy?url=';
+      return base + encodeURIComponent(originalUrl.trim());
     }
-    const proxyUrl = getProxyUrl(originalUrl);
-    videoPlayer.src = proxyUrl;
-    videoPlayer.load();
-    videoPlayer.play().catch(() => {});
-    downloadBtn.disabled = false;
-    downloadBtn.onclick = () => window.open(proxyUrl, '_blank');
-    copyBtn.onclick = () => {
-      navigator.clipboard.writeText(proxyUrl).then(() => {
-        setStatus('✅ Proxy URL copied to clipboard!', 'success');
-      }).catch(() => {
-        const ta = document.createElement('textarea');
-        ta.value = proxyUrl;
-        document.body.appendChild(ta);
-        ta.select();
-        document.execCommand('copy');
-        document.body.removeChild(ta);
-        setStatus('✅ Proxy URL copied!', 'success');
-      });
-    };
-    setStatus(`✅ Loaded: ${originalUrl}`, 'success');
-  }
 
-  function setStatus(msg, type = 'info') {
-    statusDiv.textContent = msg;
-    statusDiv.className = 'status';
-    if (type === 'error') statusDiv.classList.add('error');
-    if (type === 'success') statusDiv.classList.add('success');
-  }
+    function setStatus(msg, type = 'info') {
+      statusDiv.textContent = msg;
+      statusDiv.className = 'status ' + type;
+    }
 
-  loadBtn.addEventListener('click', () => loadVideo(videoUrlInput.value));
-  videoUrlInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') loadBtn.click(); });
-
-  const urlParams = new URLSearchParams(window.location.search);
-  const initialUrl = urlParams.get('url');
-  if (initialUrl) {
-    videoUrlInput.value = initialUrl;
-    loadVideo(initialUrl);
-  }
-
-  videoPlayer.addEventListener('error', (e) => {
-    const err = videoPlayer.error;
-    let msg = 'Video error: ';
-    if (err) {
-      switch (err.code) {
-        case 1: msg += 'MEDIA_ERR_ABORTED'; break;
-        case 2: msg += 'NETWORK – proxy down or video unavailable.'; break;
-        case 3: msg += 'DECODE – video may be corrupted.'; break;
-        case 4: msg += 'FORMAT not supported.'; break;
-        default: msg += err.message;
+    function loadVideo(originalUrl) {
+      originalUrl = (originalUrl || '').trim();
+      if (!originalUrl) {
+        setStatus('Please enter a valid URL.', 'error');
+        return;
       }
-    } else {
-      msg += 'Unknown error.';
+
+      try {
+        new URL(originalUrl); // basic validation
+      } catch {
+        setStatus('Invalid URL format.', 'error');
+        return;
+      }
+
+      const proxyUrl = getProxyUrl(originalUrl);
+      currentProxyUrl = proxyUrl;
+
+      // Reset player
+      videoPlayer.pause();
+      videoPlayer.removeAttribute('src');
+      videoPlayer.load();
+
+      setStatus('Loading…', 'info');
+
+      videoPlayer.src = proxyUrl;
+      videoPlayer.load();
+
+      // Try to play (may be blocked by autoplay policy)
+      const playPromise = videoPlayer.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          // Autoplay blocked – user can click play manually
+        });
+      }
+
+      downloadBtn.disabled = false;
+      downloadBtn.onclick = () => {
+        // Force download by opening in new tab with download attribute trick
+        const a = document.createElement('a');
+        a.href = proxyUrl;
+        a.download = '';
+        a.target = '_blank';
+        a.rel = 'noopener';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      };
+
+      copyBtn.onclick = async () => {
+        try {
+          await navigator.clipboard.writeText(proxyUrl);
+          setStatus('✅ Proxy URL copied to clipboard!', 'success');
+        } catch {
+          // Fallback
+          const ta = document.createElement('textarea');
+          ta.value = proxyUrl;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+          setStatus('✅ Proxy URL copied!', 'success');
+        }
+      };
+
+      openBtn.onclick = () => {
+        window.open(proxyUrl, '_blank', 'noopener');
+      };
+
+      setStatus('✅ Loaded – if video does not start, click the play button', 'success');
     }
-    setStatus('❌ ' + msg, 'error');
-  });
-</script>
+
+    loadBtn.addEventListener('click', () => loadVideo(videoUrlInput.value));
+    videoUrlInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') loadBtn.click();
+    });
+
+    // Support ?url=... deep link
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialUrl = urlParams.get('url');
+    if (initialUrl) {
+      videoUrlInput.value = initialUrl;
+      loadVideo(initialUrl);
+    }
+
+    // Better error messages
+    videoPlayer.addEventListener('error', () => {
+      const err = videoPlayer.error;
+      let msg = 'Video error: ';
+      if (err) {
+        switch (err.code) {
+          case 1: msg += 'MEDIA_ERR_ABORTED (playback aborted)'; break;
+          case 2: msg += 'NETWORK – proxy down, blocked, or video unavailable'; break;
+          case 3: msg += 'DECODE – video may be corrupted or unsupported codec'; break;
+          case 4: msg += 'FORMAT not supported (check Content-Type / codec)'; break;
+          default: msg += err.message || 'Unknown';
+        }
+      } else {
+        msg += 'Unknown error';
+      }
+      setStatus('❌ ' + msg, 'error');
+    });
+
+    videoPlayer.addEventListener('loadedmetadata', () => {
+      setStatus(`✅ Ready · ${Math.round(videoPlayer.duration)}s · ${videoPlayer.videoWidth}×${videoPlayer.videoHeight}`, 'success');
+    });
+
+    videoPlayer.addEventListener('waiting', () => {
+      // buffering
+    });
+  </script>
 </body>
-</html>
+  </html>
+    
