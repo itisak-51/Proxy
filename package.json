@@ -1,0 +1,10 @@
+{
+  "name": "video-proxy-player",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Simple streaming video proxy + HTML5 player for Vercel",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  }
+}
